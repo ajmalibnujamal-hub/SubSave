@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SubSave – Every word. Within reach.</title>
+  <meta name="description" content="Download YouTube subtitles as SRT, VTT or TXT. Videos and playlists, many languages.">
+  <meta name="theme-color" content="#111111">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/" aria-label="SubSave home">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#111111"/><rect x="6" y="12" width="20" height="3.5" rx="1.75" fill="#C9A227"/><rect x="9" y="19" width="14" height="3.5" rx="1.75" fill="#FFFFFF"/></svg>
+      <span class="brand-name">SubSave</span>
+    </a>
+    <div class="top-actions">
+      <span id="netStatus" class="pill pill-warn" hidden>Offline</span>
+      <button id="installBtn" class="btn btn-ghost" type="button" hidden>Install app</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Every word. Within reach.</h1>
+      <p class="lede">Paste a YouTube video or playlist link. Download its subtitles as SRT, VTT or TXT, in the language you need.</p>
+      <form id="analyzeForm" class="caption-bar" novalidate>
+        <label class="sr-only" for="urlInput">YouTube video or playlist link</label>
+        <input id="urlInput" name="url" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="https://www.youtube.com/watch?v=…" maxlength="2048" required>
+        <button id="analyzeBtn" class="btn btn-gold" type="submit">Analyze</button>
+      </form>
+      <p id="message" class="message" role="status" aria-live="polite" hidden></p>
+      <p id="offlineNote" class="note" hidden>You are offline. The app opens without internet, but reading and processing subtitles needs a connection.</p>
+    </section>
+
+    <section id="videoPanel" class="card" hidden aria-labelledby="videoTitle">
+      <div class="video-head">
+        <img id="videoThumb" class="thumb" alt="" width="320" height="180" referrerpolicy="no-referrer">
+        <div class="video-meta">
+          <h2 id="videoTitle"></h2>
+          <p id="videoChannel" class="muted"></p>
+          <p id="videoFacts" class="muted small"></p>
+        </div>
+      </div>
+      <div class="manager">
+        <h3>Subtitles</h3>
+        <p id="trackSummary" class="muted small"></p>
+        <div id="trackControls">
+          <div class="field">
+            <label for="trackSelect">Language</label>
+            <select id="trackSelect"></select>
+          </div>
+          <p id="trackHint" class="note" hidden></p>
+          <fieldset class="field seg" id="videoFormat">
+            <legend>Format</legend>
+            <label><input type="radio" name="vfmt" value="srt" checked><span>SRT</span></label>
+            <label><input type="radio" name="vfmt" value="vtt"><span>VTT</span></label>
+            <label><input type="radio" name="vfmt" value="txt"><span>TXT</span></label>
+          </fieldset>
+          <button id="videoDownloadBtn" class="btn btn-dark" type="button">Download subtitles</button>
+        </div>
+        <p id="noTracks" class="note" hidden>YouTube offers no subtitles for this video. SubSave only delivers subtitles that YouTube provides.</p>
+        <button id="loadPlaylistBtn" class="btn btn-ghost" type="button" hidden>This video is in a playlist. Open the playlist</button>
+      </div>
+    </section>
+
+    <section id="playlistPanel" class="card" hidden aria-labelledby="playlistTitle">
+      <h2 id="playlistTitle"></h2>
+      <p id="playlistFacts" class="muted small"></p>
+      <p id="playlistNote" class="note" hidden></p>
+      <div class="controls">
+        <div class="field">
+          <label for="plLang">Language</label>
+          <select id="plLang"></select>
+        </div>
+        <div class="field" id="plOtherWrap" hidden>
+          <label for="plOther">Language code</label>
+          <input id="plOther" type="text" maxlength="20" placeholder="e.g. mr or zh-Hans" autocomplete="off" autocapitalize="none" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="plFormat">Format</label>
+          <select id="plFormat"><option value="srt">SRT</option><option value="vtt">VTT</option><option value="txt">TXT</option></select>
+        </div>
+      </div>
+      <p class="note">SubSave asks YouTube for this language on every video: uploader captions first, then auto-generated captions or YouTube’s auto-translation when offered. Videos without it are reported as failed.</p>
+      <div class="list-tools">
+        <button id="selectAllBtn" class="btn btn-ghost" type="button">Select all</button>
+        <button id="deselectAllBtn" class="btn btn-ghost" type="button">Deselect all</button>
+      </div>
+      <ul id="playlistList" class="vlist"></ul>
+      <div id="zipBar" class="zip-bar">
+        <p id="selectedCount" class="zip-count">0 selected</p>
+        <button id="zipBtn" class="btn btn-gold" type="button" disabled>Download ZIP</button>
+      </div>
+      <div id="progressWrap" class="progress-wrap" hidden>
+        <div class="progress" role="progressbar" aria-label="Preparing ZIP" aria-valuetext="Working"><div class="bar"></div></div>
+        <p id="progressText" class="small muted"></p>
+      </div>
+      <div id="zipResult" class="result" hidden></div>
+    </section>
+  </main>
+
+  <footer class="foot wrap">
+    <p>SubSave only retrieves subtitles that YouTube already makes public. It does not bypass private, age-restricted or login-protected videos. Respect creators’ rights and YouTube’s Terms of Service.</p>
+  </footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
