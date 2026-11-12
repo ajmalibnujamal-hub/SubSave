@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: subsave
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TEMP_DIR
+        value: /tmp/subsave
+      - key: MAX_PLAYLIST_VIDEOS
+        value: "300"
+      - key: MAX_ZIP_VIDEOS
+        value: "100"
+      - key: ZIP_TIME_BUDGET
+        value: "85"
